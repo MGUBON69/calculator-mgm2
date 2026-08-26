@@ -280,6 +280,15 @@
         
         document.getElementById('resultBox').style.display = 'block';
     }
+    // ป้องกันปัญหา fbclid จาก Facebook บนมือถือ
+    (function() {
+        var url = new URL(window.location.href);
+        if (url.searchParams.has('fbclid')) {
+            url.searchParams.delete('fbclid');
+            // ทำการอัปเดต URL บนแถบเบราว์เซอร์โดยไม่รีโหลดหน้าเว็บ
+            window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+        }
+    })();
 </script>
 
 </body>
