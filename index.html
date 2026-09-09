@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MGM2 Calculator - Evolution Theme</title>
+    
+    <!-- PWA Primary Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MGM2 Calc">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/00e5ff/000000?text=MGM2">
+
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,6 +27,8 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .calculator-card {
@@ -189,7 +201,7 @@
 <body>
 
 <div class="calculator-card">
-    <h2>MGM2 Calculator สำหรับทีมขาย</h2>
+    <h2>MGM2 Calculator</h2>
     
     <div class="form-group">
         <label for="carPrice">ราคารถ (บาท)</label>
@@ -216,7 +228,7 @@
         </select>
     </div>
 
-    <button onclick="calculateInstallment()">คำนวณค่างวด</button>
+    <button onclick="calculateInstallment()">คำนวณค่างวดเบื้องต้น</button>
 
     <div class="result-box" id="resultBox">
         <p>สัดส่วนเงินดาวน์: <span id="resDownPercent">0%</span></p>
@@ -250,29 +262,31 @@
             return;
         }
 
-        // คำนวณเปอร์เซ็นต์ดาวน์จากยอดเงินที่กรอก
         let downPercentRaw = (downAmt / price) * 100;
-
         const financeAmount = price - downAmt;
         const years = termMonths / 12;
 
-        // คำนวณดอกเบี้ยรวมตามอัตราที่ผู้ใช้ระบุ
         const totalInterest = financeAmount * (ratePerYear / 100) * years;
-        
-        // คำนวณค่างวดต่อเดือน
         const monthlyPaymentNoVat = (financeAmount + totalInterest) / termMonths;
 
         document.getElementById('resDownPercent').innerText = downPercentRaw.toFixed(2) + "%";
         document.getElementById('resFinance').innerText = financeAmount.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('resRate').innerText = ratePerYear.toFixed(2) + "% ต่อปี";
-        
-        // แสดงผลลัพธ์ค่างวดสุทธิ พร้อมบังคับโชว์ทศนิยม 2 ตำแหน่ง
         document.getElementById('resMonthlyNoVat').innerText = monthlyPaymentNoVat.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท/เดือน";
         
         document.getElementById('resultBox').style.display = 'block';
     }
 
-    // ป้องกันปัญหา fbclid จาก Facebook บนมือถือ
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA Service Worker Registered Successfully!'))
+                .catch(err => console.log('Service Worker Registration Failed:', err));
+        });
+    }
+
+    // Prevent fbclid url parameter
     (function() {
         var url = new URL(window.location.href);
         if (url.searchParams.has('fbclid')) {
