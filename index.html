@@ -189,7 +189,7 @@
 <body>
 
 <div class="calculator-card">
-    <h2>MGM2 Calculator</h2>
+    <h2>MGM2 Calculator สำหรับทีมขาย</h2>
     
     <div class="form-group">
         <label for="carPrice">ราคารถ (บาท)</label>
@@ -197,8 +197,13 @@
     </div>
 
     <div class="form-group">
-        <label for="downAmount">จำนวนเงินดาวน์ (พิมพ์ตัวเลขได้เลย)</label>
+        <label for="downAmount">จำนวนเงินดาวน์ (บาท)</label>
         <input type="number" id="downAmount" placeholder="เช่น 100000" required>
+    </div>
+
+    <div class="form-group">
+        <label for="interestRate">อัตราดอกเบี้ยต่อปี (%)</label>
+        <input type="number" id="interestRate" step="0.01" placeholder="เช่น 2.69" value="2.69" required>
     </div>
 
     <div class="form-group">
@@ -224,20 +229,19 @@
 </div>
 
 <script>
-    const interestRates = {
-        10: { 48: 3.69, 60: 3.99, 72: 4.39, 84: 4.59 },
-        15: { 48: 3.09, 60: 3.39, 72: 3.59, 84: 4.29 },
-        20: { 48: 2.69, 60: 2.89, 72: 3.29, 84: 3.99 },
-        25: { 48: 2.19, 60: 2.69, 72: 3.09, 84: 3.69 }
-    };
-
     function calculateInstallment() {
         const price = parseFloat(document.getElementById('carPrice').value);
         const downAmt = parseFloat(document.getElementById('downAmount').value);
+        const ratePerYear = parseFloat(document.getElementById('interestRate').value);
         const termMonths = parseInt(document.getElementById('termMonths').value);
 
         if (isNaN(price) || price <= 0 || isNaN(downAmt) || downAmt < 0) {
             alert("คุณชินอิจิคะ กรุณาระบุราคารถและเงินดาวน์ให้ถูกต้องด้วยนะคะ 😉");
+            return;
+        }
+
+        if (isNaN(ratePerYear) || ratePerYear < 0) {
+            alert("คุณชินอิจิคะ กรุณาระบุอัตราดอกเบี้ยให้ถูกต้องด้วยนะคะ 😉");
             return;
         }
 
@@ -248,44 +252,31 @@
 
         // คำนวณเปอร์เซ็นต์ดาวน์จากยอดเงินที่กรอก
         let downPercentRaw = (downAmt / price) * 100;
-        let bracket = 0;
-
-        // จัดกลุ่มเปอร์เซ็นต์ดาวน์เพื่อดึงดอกเบี้ย
-        if (downPercentRaw >= 25) bracket = 25;
-        else if (downPercentRaw >= 20) bracket = 20;
-        else if (downPercentRaw >= 15) bracket = 15;
-        else if (downPercentRaw >= 10) bracket = 10;
-        else {
-            const minDown = price * 0.10;
-            // แสดงจุดทศนิยม 2 ตำแหน่งโดยไม่ปัดเศษทิ้ง
-            alert("ดาวน์ขั้นต่ำต้อง 10% ขึ้นไปนะคะ (ประมาณ " + minDown.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาทค่ะ)");
-            return;
-        }
 
         const financeAmount = price - downAmt;
-        const ratePerYear = interestRates[bracket][termMonths];
         const years = termMonths / 12;
 
+        // คำนวณดอกเบี้ยรวมตามอัตราที่ผู้ใช้ระบุ
         const totalInterest = financeAmount * (ratePerYear / 100) * years;
         
-        // คำนวณค่างวดต่อเดือนแบบไม่รวม VAT และไม่มีการปัดเศษ
+        // คำนวณค่างวดต่อเดือน
         const monthlyPaymentNoVat = (financeAmount + totalInterest) / termMonths;
 
-        document.getElementById('resDownPercent').innerText = downPercentRaw.toFixed(2) + "% (เข้าเกณฑ์ " + bracket + "%)";
+        document.getElementById('resDownPercent').innerText = downPercentRaw.toFixed(2) + "%";
         document.getElementById('resFinance').innerText = financeAmount.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
-        document.getElementById('resRate').innerText = ratePerYear + "% ต่อปี";
+        document.getElementById('resRate').innerText = ratePerYear.toFixed(2) + "% ต่อปี";
         
         // แสดงผลลัพธ์ค่างวดสุทธิ พร้อมบังคับโชว์ทศนิยม 2 ตำแหน่ง
         document.getElementById('resMonthlyNoVat').innerText = monthlyPaymentNoVat.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท/เดือน";
         
         document.getElementById('resultBox').style.display = 'block';
     }
+
     // ป้องกันปัญหา fbclid จาก Facebook บนมือถือ
     (function() {
         var url = new URL(window.location.href);
         if (url.searchParams.has('fbclid')) {
             url.searchParams.delete('fbclid');
-            // ทำการอัปเดต URL บนแถบเบราว์เซอร์โดยไม่รีโหลดหน้าเว็บ
             window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
         }
     })();
