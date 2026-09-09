@@ -3,7 +3,7 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap'
+  'icon3.png'
 ];
 
 self.addEventListener('install', event => {
