@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mgm2-calc-v1';
+const CACHE_NAME = 'mgm2-calc-v1.1';
 const urlsToCache = [
   './',
   './index.html',
