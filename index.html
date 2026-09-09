@@ -45,6 +45,7 @@
             border: 1px solid rgba(0, 229, 255, 0.2);
             position: relative;
             overflow: hidden;
+            margin-bottom: 60px; /* Space for bottom banner */
         }
 
         /* Glowing accent bar at the top */
@@ -116,7 +117,7 @@
             background-color: rgba(15, 23, 42, 0.9);
         }
 
-        button {
+        .btn-calc {
             width: 100%;
             padding: 16px;
             background: linear-gradient(135deg, #00e5ff, #7c3aed);
@@ -133,14 +134,10 @@
             font-family: inherit;
         }
 
-        button:hover {
+        .btn-calc:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
             filter: brightness(1.1);
-        }
-
-        button:active {
-            transform: translateY(0);
         }
 
         .result-box {
@@ -156,14 +153,8 @@
         }
 
         @keyframes fadeInEvolution {
-            from { 
-                opacity: 0; 
-                transform: translateY(15px) scale(0.98); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .result-box p {
@@ -196,12 +187,110 @@
             font-weight: 700;
             text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
         }
+
+        /* PWA Floating Install Banner */
+        .pwa-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px);
+            width: 90%;
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .pwa-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .pwa-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pwa-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #00e5ff, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .pwa-text h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .pwa-text p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .pwa-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-install {
+            background: linear-gradient(135deg, #00e5ff, #7c3aed);
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .btn-chrome {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00e5ff;
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
     </style>
 </head>
 <body>
 
 <div class="calculator-card">
-    <h2>MGM2 Calculator สำหรับทีมขาย</h2>
+    <h2>MGM2 Calculator</h2>
     
     <div class="form-group">
         <label for="carPrice">ราคารถ (บาท)</label>
@@ -228,7 +317,7 @@
         </select>
     </div>
 
-    <button onclick="calculateInstallment()">คำนวณค่างวด</button>
+    <button class="btn-calc" onclick="calculateInstallment()">คำนวณค่างวดเบื้องต้น</button>
 
     <div class="result-box" id="resultBox">
         <p>สัดส่วนเงินดาวน์: <span id="resDownPercent">0%</span></p>
@@ -237,6 +326,22 @@
         <p class="highlight" style="display:flex; justify-content:space-between; align-items:center;">
             ค่างวด: <span id="resMonthlyNoVat">0.00 บาท</span>
         </p>
+    </div>
+</div>
+
+<!-- PWA Floating Prompt Banner -->
+<div class="pwa-banner" id="pwaBanner">
+    <div class="pwa-info">
+        <div class="pwa-icon">MGM2</div>
+        <div class="pwa-text">
+            <h4>ติดตั้ง MGM2 App</h4>
+            <p>เพื่อการใช้งานที่รวดเร็วและเต็มจอ</p>
+        </div>
+    </div>
+    <div class="pwa-actions">
+        <button class="btn-install" id="btnInstall">ติดตั้ง</button>
+        <button class="btn-chrome" id="btnChrome" onclick="openInChrome()">เปิดใน Chrome</button>
+        <button class="btn-close" onclick="closePwaBanner()">✕</button>
     </div>
 </div>
 
@@ -277,12 +382,61 @@
         document.getElementById('resultBox').style.display = 'block';
     }
 
-    // Register Service Worker for PWA
+    // PWA & Browser Redirection Logic
+    let deferredPrompt;
+    const pwaBanner = document.getElementById('pwaBanner');
+    const btnInstall = document.getElementById('btnInstall');
+
+    // ตรวจสอบ event ก่อนติดตั้ง PWA (สำหรับ Android/Chrome)
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // แสดง Banner ลอยขึ้นมา
+        pwaBanner.classList.add('show');
+    });
+
+    btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User installed PWA');
+            }
+            deferredPrompt = null;
+            pwaBanner.classList.remove('show');
+        } else {
+            // สำหรับ iOS หรือ เบราว์เซอร์ที่ไม่รองรับ direct prompt
+            alert("สำหรับ iPhone/iPad (Safari):\nให้กดปุ่ม 'แชร์ (Share)' ด้านล่าง แล้วเลือก 'เพิ่มไปยังหน้าจอหลัก (Add to Home Screen)' นะคะคุณชินอิจิ ✨");
+        }
+    });
+
+    // ฟังก์ชันเด้งไปเปิดใน Google Chrome
+    function openInChrome() {
+        const currentUrl = window.location.href;
+        
+        // เช็คว่าเป็น iOS หรือไม่
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        if (isIOS) {
+            // แปลง https:// เป็น googlechromes:// เพื่อเปิดในแอป Chrome บน iOS
+            const chromeUrl = currentUrl.replace(/^https?:\/\//, 'googlechromes://');
+            window.location.href = chromeUrl;
+        } else {
+            // สำหรับ Android หรือ Desktop
+            window.location.href = currentUrl;
+        }
+    }
+
+    function closePwaBanner() {
+        pwaBanner.classList.remove('show');
+    }
+
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('PWA Service Worker Registered Successfully!'))
-                .catch(err => console.log('Service Worker Registration Failed:', err));
+                .then(reg => console.log('Service Worker Registered!'))
+                .catch(err => console.log('SW Registration Failed:', err));
         });
     }
 
