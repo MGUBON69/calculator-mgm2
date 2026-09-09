@@ -45,7 +45,6 @@
             border: 1px solid rgba(0, 229, 255, 0.2);
             position: relative;
             overflow: hidden;
-            margin-bottom: 60px; /* Space for bottom banner */
         }
 
         /* Glowing accent bar at the top */
@@ -188,102 +187,119 @@
             text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
         }
 
-        /* PWA Floating Install Banner */
-        .pwa-banner {
+        /* PWA Center Modal Style */
+        .pwa-overlay {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(150px);
-            width: 90%;
-            max-width: 420px;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 7, 10, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .pwa-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pwa-modal {
             background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
-            backdrop-filter: blur(20px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 20px;
+            padding: 28px 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0, 229, 255, 0.2), 0 0 30px rgba(124, 58, 237, 0.25);
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
 
-        .pwa-banner.show {
-            transform: translateX(-50%) translateY(0);
+        .pwa-overlay.show .pwa-modal {
+            transform: scale(1);
         }
 
-        .pwa-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .pwa-icon {
-            width: 42px;
-            height: 42px;
+        .pwa-modal-icon {
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, #00e5ff, #7c3aed);
-            border-radius: 10px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 700;
             color: #fff;
-            font-size: 12px;
-            flex-shrink: 0;
+            font-size: 16px;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
         }
 
-        .pwa-text h4 {
-            margin: 0;
+        .pwa-modal h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .pwa-modal p {
+            margin: 0 0 24px 0;
             font-size: 14px;
-            color: #fff;
-        }
-
-        .pwa-text p {
-            margin: 2px 0 0 0;
-            font-size: 11px;
             color: #94a3b8;
+            line-height: 1.5;
         }
 
-        .pwa-actions {
+        .pwa-modal-actions {
             display: flex;
-            gap: 6px;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .btn-install {
+        .btn-modal-install {
+            width: 100%;
+            padding: 14px;
             background: linear-gradient(135deg, #00e5ff, #7c3aed);
-            color: #fff;
+            color: #ffffff;
             border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.2s;
+        }
+
+        .btn-modal-chrome {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #00e5ff;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            white-space: nowrap;
             font-family: inherit;
         }
 
-        .btn-chrome {
-            background: rgba(255, 255, 255, 0.1);
-            color: #00e5ff;
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-family: inherit;
-        }
-
-        .btn-close {
+        .btn-modal-close {
             background: none;
             border: none;
             color: #64748b;
-            font-size: 18px;
+            font-size: 13px;
+            margin-top: 8px;
             cursor: pointer;
-            padding: 4px;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -329,19 +345,17 @@
     </div>
 </div>
 
-<!-- PWA Floating Prompt Banner -->
-<div class="pwa-banner" id="pwaBanner">
-    <div class="pwa-info">
-        <div class="pwa-icon">MGM2</div>
-        <div class="pwa-text">
-            <h4>ติดตั้ง MGM2 App</h4>
-            <p>เพื่อการใช้งานที่รวดเร็วและเต็มจอ</p>
+<!-- PWA Center Modal -->
+<div class="pwa-overlay" id="pwaOverlay">
+    <div class="pwa-modal">
+        <div class="pwa-modal-icon">MGM2</div>
+        <h3>ติดตั้งแอปพลิเคชัน</h3>
+        <p>ติดตั้ง MGM2 Calculator เพื่อเปิดใช้งานได้รวดเร็วทันใจ พร้อมรองรับการทำงานแบบออฟไลน์ค่ะ</p>
+        <div class="pwa-modal-actions">
+            <button class="btn-modal-install" id="btnInstall">ติดตั้งลงเครื่องทันที</button>
+            <button class="btn-modal-chrome" onclick="openInChrome()">เปิดด้วย Google Chrome</button>
+            <button class="btn-modal-close" onclick="closePwaModal()">ไว้ทีหลัง</button>
         </div>
-    </div>
-    <div class="pwa-actions">
-        <button class="btn-install" id="btnInstall">ติดตั้ง</button>
-        <button class="btn-chrome" id="btnChrome" onclick="openInChrome()">เปิดใน Chrome</button>
-        <button class="btn-close" onclick="closePwaBanner()">✕</button>
     </div>
 </div>
 
@@ -382,17 +396,17 @@
         document.getElementById('resultBox').style.display = 'block';
     }
 
-    // PWA & Browser Redirection Logic
+    // PWA & Center Modal Logic
     let deferredPrompt;
-    const pwaBanner = document.getElementById('pwaBanner');
+    const pwaOverlay = document.getElementById('pwaOverlay');
     const btnInstall = document.getElementById('btnInstall');
 
     // ตรวจสอบ event ก่อนติดตั้ง PWA (สำหรับ Android/Chrome)
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // แสดง Banner ลอยขึ้นมา
-        pwaBanner.classList.add('show');
+        // เด้ง Modal ขึ้นมากลางจอทันที
+        pwaOverlay.classList.add('show');
     });
 
     btnInstall.addEventListener('click', async () => {
@@ -403,7 +417,7 @@
                 console.log('User installed PWA');
             }
             deferredPrompt = null;
-            pwaBanner.classList.remove('show');
+            pwaOverlay.classList.remove('show');
         } else {
             // สำหรับ iOS หรือ เบราว์เซอร์ที่ไม่รองรับ direct prompt
             alert("สำหรับ iPhone/iPad (Safari):\nให้กดปุ่ม 'แชร์ (Share)' ด้านล่าง แล้วเลือก 'เพิ่มไปยังหน้าจอหลัก (Add to Home Screen)' นะคะคุณชินอิจิ ✨");
@@ -413,22 +427,18 @@
     // ฟังก์ชันเด้งไปเปิดใน Google Chrome
     function openInChrome() {
         const currentUrl = window.location.href;
-        
-        // เช็คว่าเป็น iOS หรือไม่
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         
         if (isIOS) {
-            // แปลง https:// เป็น googlechromes:// เพื่อเปิดในแอป Chrome บน iOS
             const chromeUrl = currentUrl.replace(/^https?:\/\//, 'googlechromes://');
             window.location.href = chromeUrl;
         } else {
-            // สำหรับ Android หรือ Desktop
             window.location.href = currentUrl;
         }
     }
 
-    function closePwaBanner() {
-        pwaBanner.classList.remove('show');
+    function closePwaModal() {
+        pwaOverlay.classList.remove('show');
     }
 
     // Register Service Worker
